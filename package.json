@@ -22,9 +22,12 @@
   },
   "homepage": "https://github.com/Frank1255390/Full-stack-Demo#readme",
   "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
     "vite": "^8.3.4"
   },
   "dependencies": {
-    "animejs": "^4.5.0"
+    "animejs": "^4.5.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }
