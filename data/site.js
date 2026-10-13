@@ -16,7 +16,7 @@ export const home = {
   },
   identity: {
     motto: "老天爷放我一马",
-    learning: "零到全栈",
+    learning: "全栈",
   },
 };
 
