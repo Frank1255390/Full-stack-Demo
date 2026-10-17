@@ -1,5 +1,5 @@
 # dependencies
-node_modules/
+node_modules
 
 # next.js
 .next/
@@ -16,3 +16,8 @@ dist/
 # misc
 *.log
 .env*
+
+# backend
+.venv/
+__pycache__
+*.pyc
