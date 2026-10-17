@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-
 app = FastAPI()
 
 app.add_middleware(
@@ -11,7 +10,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"]
 )
-
 
 profile = {
     "heroTitle": "我的项目Backend",  # → 临时加的标记，验证完删掉
@@ -27,7 +25,6 @@ profile = {
         "learning": "全栈",
     },
 }
-
 
 class AnalyzeRequest(BaseModel):
     text: str
