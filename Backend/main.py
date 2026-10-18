@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pypinyin import lazy_pinyin, Style
 from snownlp import SnowNLP
 
-
 HISTORY_FILE = "history.json"
 
 def load_history():
@@ -21,6 +20,7 @@ def save_record(record):
     records.append(record)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
+    # ensure_ascii 让文件的中文可以直接阅读,indent 设置首行缩进
 
 app = FastAPI()
 
@@ -30,7 +30,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"]
 )
-
 
 profile = {
     "heroTitle": "我的项目",
@@ -55,6 +54,8 @@ def score_label(score):
     else:
         return "中性"
 
+# BaseModel 根据下面的说明检查收到的数据格式
+# 前端传入的 JSON 格式就是 {"text":"今天很开心"}
 class AnalyzeRequest(BaseModel):
     text: str
 
@@ -76,8 +77,9 @@ def analyze(req: AnalyzeRequest):
         "text":text,
         "score":score,
         "label":score_label(score),
-        "pinyin":"".join(lazy_pinyin(text, style=Style.TONE)),
+        "pinyin":" ".join(lazy_pinyin(text, style=Style.TONE)),
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds")
+        # isoformat 把时间保存成标准格式
     }
     save_record(result)
     return result

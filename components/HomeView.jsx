@@ -10,12 +10,15 @@ import Nav from "./Nav.jsx";
 import PageHeading from "./PageHeading.jsx";
 import AnimatedCardGrid from "./AnimatedCardGrid.jsx";
 import { home } from "../data/site.js";
+
 const API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function HomeView() {
   const [data, setData] = useState(home);
 
   useEffect(() => {
+    // async 表示这个函数可能需要等待一段时间,因为需要等待后端回答
+    // 专业说法可能是叫 异步函数 ???
     async function loadProfile() {
       try {
         const res = await fetch(`${API}/api/profile`);
@@ -39,6 +42,7 @@ export default function HomeView() {
       </article>
 
       <article className="panel panel-full featured-work-panel card">
+        {/* 按照 className 的内容对应文字的显示样式 */}
         <p className="section-kicker">{data.featuredWork.kicker}</p>
         <p className="featured-title">{data.featuredWork.title}</p>
         <p className="featured-copy">{data.featuredWork.copy}</p>

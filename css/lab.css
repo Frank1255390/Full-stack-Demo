@@ -111,6 +111,14 @@
   word-break: break-word;
 }
 
+.result-item p.result-placeholder {
+  color: var(--text-muted);
+}
+
+.result-badge strong.result-placeholder {
+  color: rgba(29, 29, 31, 0.4);
+}
+
 .result-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
