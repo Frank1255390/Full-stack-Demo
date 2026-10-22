@@ -1,4 +1,4 @@
-import json
+from storage import init_db, save_record, get_history
 from datetime import datetime, timezone
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -6,23 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pypinyin import lazy_pinyin, Style
 from snownlp import SnowNLP
 
-HISTORY_FILE = "history.json"
-
-def load_history():
-    try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-
-def save_record(record):
-    records = load_history()
-    records.append(record)
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(records, f, ensure_ascii=False, indent=2)
-    # ensure_ascii 让文件的中文可以直接阅读,indent 设置首行缩进
-
 app = FastAPI()
+
+init_db()  # 初始化数据库，创建表格
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,12 +49,6 @@ class AnalyzeRequest(BaseModel):
 def get_profile():
     return profile
 
-@app.get("/api/history")
-def history():
-    records = load_history()   # 读出文件里的全部记录
-    records.reverse()
-    return records[:5]
-
 @app.post("/api/analyze")
 def analyze(req: AnalyzeRequest):
     text = req.text
@@ -83,3 +63,7 @@ def analyze(req: AnalyzeRequest):
     }
     save_record(result)
     return result
+
+@app.get("/api/history")
+def history():
+    return get_history(5)
