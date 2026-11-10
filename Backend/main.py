@@ -1,6 +1,7 @@
+import uuid
 from storage import init_db, save_record, get_history
 from datetime import datetime, timezone
-from fastapi import FastAPI
+from fastapi import Request, Response,  FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from pypinyin import lazy_pinyin, Style
@@ -14,8 +15,20 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
     allow_methods=["GET", "POST"],
-    allow_headers=["*"]
+    allow_headers=["*"],
+    allow_credentials=True,          # ← 新增：允许跨源请求带上 cookie
 )
+
+def get_session_id(request: Request, response: Response) -> str:
+    sid = request.cookies.get("session_id")      # 先看有没有纸条
+    if not sid:                                  # 第一次来，没有——发一张
+        sid = uuid.uuid4().hex                    # 一串随机、不重复的 id
+        response.set_cookie(
+            "session_id", sid,
+            httponly=True, samesite="lax",
+            max_age=60 * 60 * 24 * 7,            # 记 7 天
+        )
+    return sid
 
 profile = {
     "heroTitle": "我的项目",
@@ -50,7 +63,8 @@ def get_profile():
     return profile
 
 @app.post("/api/analyze")
-def analyze(req: AnalyzeRequest):
+def analyze(req: AnalyzeRequest, request: Request, response: Response):
+    sid = get_session_id(request, response)
     text = req.text
     score = round(SnowNLP(text).sentiments, 2)
     result = {
@@ -61,9 +75,10 @@ def analyze(req: AnalyzeRequest):
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds")
         # isoformat 把时间保存成标准格式
     }
-    save_record(result)
+    save_record(sid, result)
     return result
 
 @app.get("/api/history")
-def history():
-    return get_history(5)
+def history(request: Request, response: Response):
+    sid = get_session_id(request, response)
+    return get_history(sid, 5)

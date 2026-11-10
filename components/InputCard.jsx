@@ -28,6 +28,7 @@ export default function InputCard({ onResult }) {
       const res = await fetch(`${API}/api/analyze`, {
         method: "POST", // method 用与说明请求方式
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ← 新增：带上 cookie
         body: JSON.stringify({ text }),
       });
 

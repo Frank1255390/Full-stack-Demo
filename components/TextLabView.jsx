@@ -9,10 +9,25 @@ import PageHeading from "./PageHeading.jsx"; // 标题部件
 import AnimatedCardGrid from "./AnimatedCardGrid.jsx"; // 动画区域
 import InputCard from "./InputCard.jsx"; // 输入卡片
 import ResultCard from "./ResultCard.jsx"; // 结果卡片
+import HistoryModal from "./HistoryModal.jsx";
 import { textLab } from "../data/site.js"; // 文字实验室的标题
+
+const API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function TextLabView() {
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  async function openHistory() {
+    setHistoryOpen(true);
+    try {
+      const res = await fetch(`${API}/api/history`, { credentials: "include" });
+      setHistory(await res.json());
+    } catch {
+      // 后端没起来时不让页面崩掉，弹窗显示"还没有记录"
+    }
+  }
 
   return (
     // AnimatedCardGrid 是卡片进入动画
@@ -32,7 +47,13 @@ export default function TextLabView() {
       这样在 InputCard 中使用 onResult 时,就是在调用 setResult 函数
       */}
       <InputCard onResult={setResult} />
-      <ResultCard result={result} />
+      <ResultCard result={result} onOpenHistory={openHistory} />
+
+      <HistoryModal
+        open={historyOpen}
+        items={history}
+        onClose={() => setHistoryOpen(false)}
+      />
     </AnimatedCardGrid>
   );
 }
